@@ -1,3 +1,48 @@
+// Types for multilingual text and coordinates
+export interface MultilingualText {
+  [langCode: string]: string; // { fa: "عنوان فارسی", en: "English Title", ar: "العنوان" }
+}
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+// ------------------- LOCATION -------------------
+
+export interface Location {
+  id?: string;
+  name: MultilingualText;
+  description: MultilingualText;
+  category: 'historical' | 'natural' | 'cultural' | 'religious';
+  images: string[];
+  mainImageIndex?: number;
+  latlng?: LatLng;
+  facilities?: Record<string, string[]>; // چندزبانه
+  openingHours: MultilingualText;
+  entryFee: MultilingualText;
+  rating: number;
+  reviews: number;
+}
+
+export interface CreateLocationDto {
+  name: MultilingualText;
+  description: MultilingualText;
+  category: 'historical' | 'natural' | 'cultural' | 'religious';
+  images: string[];
+  mainImageIndex?: number;
+  latlng?: LatLng;
+  facilities?: Record<string, string[]>;
+  openingHours: MultilingualText;
+  entryFee: MultilingualText;
+  rating?: number;
+  reviews?: number;
+}
+
+export interface UpdateLocationDto extends Partial<CreateLocationDto> {}
+
+// ------------------- CUSTOMER -------------------
+
 export interface Customer {
   id: string;
   firstName: string;
@@ -17,115 +62,12 @@ export interface CreateCustomerDto {
   bankAccountNumber: string;
 }
 
-export interface UpdateCustomerDto {
-  firstName?: string;
-  lastName?: string;
-  dateOfBirth?: Date;
-  phoneNumber?: string;
-  email?: string;
-  bankAccountNumber?: string;
-}
+export interface UpdateCustomerDto extends Partial<CreateCustomerDto> {}
 
-
-export interface Event {
-  id: string;
-
-  // فیلدهای چندزبانه
-  title: MultilingualText;
-  description: MultilingualText;
-  location: MultilingualText;
-  organizer: MultilingualText;
-
-  image?: string | null;
-
-  // مختصات
-  latlng?: LatLng | null;
-
-  price?: number | null;
-  capacity: number;
-  registered: number;
-
-  // بازه‌های زمانی
-  timeRanges?: EventTimeRange[];
-}
+// ------------------- EVENT -------------------
 
 export interface EventTimeRange {
   id?: string;
-  mode: string; // مثلا continuous, daily, weekly و ...
-  startDate?: string;
-  endDate?: string;
-  timeStart?: string;
-  timeEnd?: string;
-  daysOfWeek?: string;
-  specificDates?: string;
-  exceptions?: string;
-  ranges?: string;
-}
-
-export interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-export interface MultilingualText {
-  [langCode: string]: string; // مثلا { fa: "عنوان فارسی", en: "English Title", ar: "العنوان" }
-}
-
-export interface CreateEventDto {
-  title: MultilingualText;       // چندزبانه
-  description: MultilingualText; // چندزبانه
-  image?: string;
-  location: MultilingualText;    // چندزبانه
-  latlng?: LatLng;
-  price?: number;
-  capacity?: number;
-  registered?: number;
-  organizer: MultilingualText;   // چندزبانه
-  timeRanges?: EventTimeRange[];
-}
-
-export interface UpdateEventDto {
-  title?: MultilingualText;
-  description?: MultilingualText;
-  image?: string;
-  location?: MultilingualText;
-  latlng?: LatLng;
-  price?: number;
-  capacity?: number;
-  registered?: number;
-  organizer?: MultilingualText;
-  timeRanges?: EventTimeRange[];
-}
-
-export interface Location {
-  id: string;
-  name: string;
-  description: string;
-  category: 'historical' | 'natural' | 'cultural' | 'religious';
-  images: string[];
-  coordinates: [number, number];
-  facilities: string[];
-  openingHours: string;
-  entryFee: string;
-  rating: number;
-  reviews: number;
-}
-
-export interface CreateLocationDto {
-  id: string;
-  name: string;
-  description: string;
-  category: 'historical' | 'natural' | 'cultural' | 'religious';
-  images: string[];
-  coordinates: [number, number];
-  facilities: string[];
-  openingHours: string;
-  entryFee: string;
-  rating: number;
-  reviews: number;
-}
-
-export interface EventTimeRangeDto {
   mode: 'continuous' | 'daily' | 'weekly' | 'specificDates' | 'multipleRanges';
   startDate?: string;
   endDate?: string;
@@ -136,3 +78,32 @@ export interface EventTimeRangeDto {
   exceptions?: string; // JSON string
   ranges?: string; // JSON string
 }
+
+export interface Event {
+  id: string;
+  title: MultilingualText;
+  description: MultilingualText;
+  location: MultilingualText;
+  organizer: MultilingualText;
+  image?: string | null;
+  latlng?: LatLng | null;
+  price?: number | null;
+  capacity: number;
+  registered: number;
+  timeRanges?: EventTimeRange[];
+}
+
+export interface CreateEventDto {
+  title: MultilingualText;
+  description: MultilingualText;
+  location: MultilingualText;
+  organizer: MultilingualText;
+  image?: string;
+  latlng?: LatLng;
+  price?: number;
+  capacity?: number;
+  registered?: number;
+  timeRanges?: EventTimeRange[];
+}
+
+export interface UpdateEventDto extends Partial<CreateEventDto> {}

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CreateEventDto, UpdateEventDto, Event, EventTimeRangeDto } from '@/types';
+import { CreateEventDto, UpdateEventDto, Event, EventTimeRange } from '@/types';
 import { TimeRangePicker } from './time-range-picker';
 import MapComponentWrapper from '@/components/ui/mapPicker';
 
@@ -274,8 +274,8 @@ export function EventFormModal({ isOpen, onClose, onSubmit, event }: EventFormMo
                     <div>
                         <Label htmlFor="timeRanges">بازه‌های زمانی</Label>
                         <TimeRangePicker
-                            value={(formData.timeRanges || []) as EventTimeRangeDto[]}
-                            onChange={(ranges: EventTimeRangeDto[]) => handleChange('timeRanges', ranges)}
+                            value={(formData.timeRanges || []) as EventTimeRange[]}
+                            onChange={(ranges: EventTimeRange[]) => handleChange('timeRanges', ranges)}
                         />
                     </div>
 

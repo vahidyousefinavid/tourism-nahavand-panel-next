@@ -7,16 +7,16 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { EventTimeRangeDto } from '@/types';
+import { EventTimeRange } from '@/types';
 import { format as formatGregorian } from 'date-fns';
 
 interface TimeRangePickerProps {
-  value: EventTimeRangeDto[];
-  onChange: (ranges: EventTimeRangeDto[]) => void;
+  value: EventTimeRange[];
+  onChange: (ranges: EventTimeRange[]) => void;
 }
 
 export function TimeRangePicker({ value, onChange }: TimeRangePickerProps) {
-  const [mode, setMode] = useState<EventTimeRangeDto['mode']>('daily');
+  const [mode, setMode] = useState<EventTimeRange['mode']>('daily');
   const [startDate, setStartDate] = useState<DateObject | null>(null);
   const [endDate, setEndDate] = useState<DateObject | null>(null);
   const [timeStart, setTimeStart] = useState<string>('');
@@ -25,7 +25,7 @@ export function TimeRangePicker({ value, onChange }: TimeRangePickerProps) {
   const addRange = () => {
     if (!startDate || !endDate) return;
 
-    const newRange: EventTimeRangeDto = {
+    const newRange: EventTimeRange = {
       mode,
       // اینجا به بک‌اند میلادی می‌فرستیم
       startDate: formatGregorian(startDate.toDate(), 'yyyy-MM-dd'),
@@ -51,7 +51,7 @@ export function TimeRangePicker({ value, onChange }: TimeRangePickerProps) {
       {/* انتخاب حالت */}
       <div>
         <label className="block mb-1 text-sm font-medium">نوع بازه</label>
-        <Select value={mode} onValueChange={(v) => setMode(v as EventTimeRangeDto['mode'])}>
+        <Select value={mode} onValueChange={(v) => setMode(v as EventTimeRange['mode'])}>
           <SelectTrigger>
             <SelectValue placeholder="انتخاب حالت" />
           </SelectTrigger>

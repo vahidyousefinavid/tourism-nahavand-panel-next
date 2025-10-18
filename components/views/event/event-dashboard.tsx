@@ -46,7 +46,7 @@ export function EventDashboard() {
       setLoading(true);
       setConnectionError(false);
       const data = await EventAPI.getAllEvents();
-      setEvents(data);
+      setEvents(data?.data);
     } catch (error: any) {
       console.error('Error loading events:', error);
       setConnectionError(true);
