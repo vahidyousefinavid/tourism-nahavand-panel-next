@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  tourism-nahavand-panel-next:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tourism-nahavand-panel-next
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - nginx-network
+
+networks:
+  nginx-network:
+    external: true

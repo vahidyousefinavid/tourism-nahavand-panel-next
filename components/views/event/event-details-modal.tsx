@@ -31,7 +31,7 @@ interface EventDetailsModalProps {
 }
 
 export function EventDetailsModal({ isOpen, onClose, eventId, onEdit, onDelete }: EventDetailsModalProps) {
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -131,7 +131,7 @@ export function EventDetailsModal({ isOpen, onClose, eventId, onEdit, onDelete }
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{event.title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{event?.title}</h2>
                     <p className="text-gray-600 flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
                       {event.location}

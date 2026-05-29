@@ -112,7 +112,7 @@ export function TimeRangePicker({ value, onChange }: TimeRangePickerProps) {
 
       {/* لیست بازه‌ها */}
       <div className="space-y-2">
-        {value.map((range, index) => (
+        {value.map((range:any, index) => (
           <div
             key={index}
             className="flex justify-between items-center p-2 border rounded"
