@@ -14,7 +14,13 @@ interface EventTableProps {
   onViewDetails: (event: Event) => void;
 }
 
-export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }: EventTableProps) {
+export function EventTable({
+  events,
+  loading,
+  onEdit,
+  onDelete,
+  onViewDetails,
+}: EventTableProps) {
   const [sortBy, setSortBy] = useState<keyof Event>('title');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -36,13 +42,11 @@ export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }:
       bValue = bValue.toLowerCase();
     }
 
-    // if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-    // if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
 
-  if (loading) return <p>Loading events...</p>;
-  if (events.length === 0) return <p>No events found.</p>;
+  if (loading) return <p>در حال بارگذاری رویدادها...</p>;
+  if (events.length === 0) return <p>هیچ رویدادی یافت نشد.</p>;
 
   return (
     <div className="space-y-4">
@@ -53,11 +57,11 @@ export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }:
             <thead>
               <tr className="border-b border-gray-200">
                 {[
-                  { label: 'Title', field: 'title' as keyof Event },
-                  { label: 'Location', field: 'location' as keyof Event },
-                  { label: 'Price', field: 'price' as keyof Event },
-                  { label: 'Capacity', field: 'capacity' as keyof Event },
-                  { label: 'Organizer', field: 'organizer' as keyof Event },
+                  { label: 'عنوان', field: 'title' as keyof Event },
+                  { label: 'مکان', field: 'location' as keyof Event },
+                  { label: 'قیمت', field: 'price' as keyof Event },
+                  { label: 'ظرفیت', field: 'capacity' as keyof Event },
+                  { label: 'برگزارکننده', field: 'organizer' as keyof Event },
                 ].map(({ label, field }) => (
                   <th key={field} className="py-3 px-4">
                     <Button
@@ -69,7 +73,7 @@ export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }:
                     </Button>
                   </th>
                 ))}
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4 text-right">عملیات</th>
               </tr>
             </thead>
             <tbody>
@@ -94,21 +98,30 @@ export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }:
                     {event.title['fa']}
                   </td>
                   <td className="py-4 px-4">{event.location['fa']}</td>
-                  <td className="py-4 px-4">{event.price ?? 'Free'}</td>
+                  <td className="py-4 px-4">
+                    {event.price ?? 'رایگان'}
+                  </td>
                   <td className="py-4 px-4">{event.capacity}</td>
                   <td className="py-4 px-4">{event.organizer['fa']}</td>
                   <td className="py-4 px-4 text-right flex justify-end space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(event)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(event)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => onDelete(event)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(event)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       </div>
@@ -116,23 +129,38 @@ export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }:
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">
         {sortedEvents.map(event => (
-          <Card key={event.id} className="p-4 hover:shadow-md transition-shadow">
+          <Card
+            key={event.id}
+            className="p-4 hover:shadow-md transition-shadow"
+          >
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-semibold text-gray-900">{event.title['fa']}</div>
-                <div className="text-sm text-gray-500">{event.location['fa']}</div>
+                <div className="font-semibold text-gray-900">
+                  {event.title['fa']}
+                </div>
                 <div className="text-sm text-gray-500">
-                  {event.price ?? 'Free'} - Capacity: {event.capacity}
+                  {event.location['fa']}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {event.price ?? 'رایگان'} — ظرفیت: {event.capacity}
                 </div>
               </div>
               <div className="flex space-x-2">
                 {/* <Button variant="ghost" size="sm" onClick={() => onViewDetails(event)}>
                   <Eye className="h-4 w-4" />
                 </Button> */}
-                <Button variant="ghost" size="sm" onClick={() => onEdit(event)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(event)}
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDelete(event)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(event)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

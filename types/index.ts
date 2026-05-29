@@ -107,3 +107,63 @@ export interface CreateEventDto {
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {}
+
+// ------------------- INVESTMENT -------------------
+
+export type InvestmentCategory =
+  | 'real-estate'
+  | 'agriculture'
+  | 'tourism'
+  | 'handicrafts'
+  | 'industry'
+  | 'technology';
+
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export type InvestmentStatus = 'active' | 'pending' | 'completed';
+
+export interface Investment {
+  id: string;
+  title: MultilingualText;
+  shortDescription: MultilingualText;
+  fullDescription: MultilingualText;
+  image?: string | null;
+  category: InvestmentCategory;
+  icon?: string | null;
+  minInvestment?: string | null;
+  maxInvestment?: string | null;
+  expectedReturn?: string | null;
+  timeframe?: string | null;
+  riskLevel?: RiskLevel | null;
+  features?: Record<string, string[]>;
+  requirements?: Record<string, string[]>;
+  benefits?: Record<string, string[]>;
+  contactInfo?: MultilingualText;
+  supportPhone?: string | null;
+  status: InvestmentStatus;
+  views?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateInvestmentDto {
+  title: MultilingualText;
+  shortDescription: MultilingualText;
+  fullDescription: MultilingualText;
+  image?: string;
+  category: InvestmentCategory;
+  icon?: string;
+  minInvestment?: string;
+  maxInvestment?: string;
+  expectedReturn?: string;
+  timeframe?: string;
+  riskLevel?: RiskLevel;
+  features?: Record<string, string[]>;
+  requirements?: Record<string, string[]>;
+  benefits?: Record<string, string[]>;
+  contactInfo?: MultilingualText;
+  supportPhone?: string;
+  status?: InvestmentStatus;
+}
+
+export interface UpdateInvestmentDto extends Partial<CreateInvestmentDto> {}

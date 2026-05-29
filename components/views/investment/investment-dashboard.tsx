@@ -1,26 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Event } from '@/types';
-import { EventTable } from '@/components/views/event/event-table';
-import { EventFormModal } from '@/components/views/event/event-form-modal';
-import { DeleteConfirmationModal } from '@/components/views/event/delete-confirmation-modal';
+import { Investment, CreateInvestmentDto } from '@/types';
+import { InvestmentTable } from '@/components/views/investment/investment-table';
+import { InvestmentFormModal } from '@/components/views/investment/investment-form-modal';
+import { DeleteConfirmationModal } from '@/components/views/investment/delete-confirmation-modal';
+import { InvestmentDetailsModal } from '@/components/views/investment/investment-details-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Calendar, Users, RefreshCw, AlertCircle } from 'lucide-react';
+import { Plus, Search, RefreshCw, AlertCircle, TrendingUp, DollarSign, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { EventAPI } from '@/lib/EventApi';
-import { EventDetailsModal } from './event-details-modal';
+import { InvestmentAPI } from '@/lib/InvestmentApi';
 
-export function EventDashboard() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+export function InvestmentDashboard() {
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [filteredInvestments, setFilteredInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedInvestment, setSelectedInvestment] = useState<Investment | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -28,33 +27,30 @@ export function EventDashboard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    loadEvents();
+    loadInvestments();
   }, []);
 
   useEffect(() => {
-    const filtered = events.filter(event =>
-      event.title?.fa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description?.fa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location?.fa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.organizer?.fa?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = investments.filter(inv =>
+      inv.title?.fa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inv.shortDescription?.fa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inv.fullDescription?.fa?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredEvents(filtered);
-  }, [events, searchTerm]);
+    setFilteredInvestments(filtered);
+  }, [investments, searchTerm]);
 
-  const loadEvents = async () => {
+  const loadInvestments = async () => {
     try {
       setLoading(true);
       setConnectionError(false);
-      const data = await EventAPI.getAllEvents();
-      setEvents(data?.data);
+      const data = await InvestmentAPI.getAllInvestments();
+      setInvestments(data.data || data || []);
     } catch (error: any) {
-      console.error('Error loading events:', error);
+      console.error('Error loading investments:', error);
       setConnectionError(true);
       toast({
         title: 'خطا در اتصال',
-        description:
-          error.message ||
-          'دریافت رویدادها با خطا مواجه شد. لطفاً از فعال بودن سرور API اطمینان حاصل کنید.',
+        description: error.message || 'دریافت فرصت‌های سرمایه‌گذاری با خطا مواجه شد. لطفاً از فعال بودن سرور API اطمینان حاصل کنید.',
         variant: 'destructive',
       });
     } finally {
@@ -62,85 +58,82 @@ export function EventDashboard() {
     }
   };
 
-  const handleSubmitEvent = async (eventData: FormData) => {
+  const handleSubmitInvestment = async (investmentData: CreateInvestmentDto) => {
     try {
-      if (selectedEvent) {
-        await EventAPI.updateEvent(selectedEvent.id, eventData);
-        toast({ title: 'موفق', description: 'رویداد با موفقیت ویرایش شد.' });
+      if (selectedInvestment) {
+        await InvestmentAPI.updateInvestment(selectedInvestment.id, investmentData);
+        toast({ title: 'موفق', description: 'فرصت سرمایه‌گذاری با موفقیت ویرایش شد.' });
       } else {
-        await EventAPI.createEvent(eventData);
-        toast({ title: 'موفق', description: 'رویداد با موفقیت ثبت شد.' });
+        await InvestmentAPI.createInvestment(investmentData);
+        toast({ title: 'موفق', description: 'فرصت سرمایه‌گذاری با موفقیت ثبت شد.' });
       }
-      await loadEvents();
+      await loadInvestments();
       setShowFormModal(false);
-      setSelectedEvent(null);
+      setSelectedInvestment(null);
     } catch (error: any) {
-      console.error('Error submitting event:', error);
+      console.error('Error submitting investment:', error);
       toast({
         title: 'خطا',
-        description:
-          error.message || 'ثبت اطلاعات رویداد با خطا مواجه شد. دوباره تلاش کنید.',
+        description: error.message || 'ثبت اطلاعات فرصت سرمایه‌گذاری با خطا مواجه شد. دوباره تلاش کنید.',
         variant: 'destructive',
       });
       throw error;
     }
   };
 
-  const handleDeleteEvent = async () => {
-    if (!selectedEvent) return;
+  const handleDeleteInvestment = async () => {
+    if (!selectedInvestment) return;
     try {
-      await EventAPI.deleteEvent(selectedEvent.id);
-      await loadEvents();
+      await InvestmentAPI.deleteInvestment(selectedInvestment.id);
+      await loadInvestments();
       setShowDeleteModal(false);
-      setSelectedEvent(null);
-      toast({ title: 'موفق', description: 'رویداد با موفقیت حذف شد.' });
+      setSelectedInvestment(null);
+      toast({ title: 'موفق', description: 'فرصت سرمایه‌گذاری با موفقیت حذف شد.' });
     } catch (error: any) {
-      console.error('Error deleting event:', error);
+      console.error('Error deleting investment:', error);
       toast({
         title: 'خطا',
-        description:
-          error.message || 'حذف رویداد با خطا مواجه شد. دوباره تلاش کنید.',
+        description: error.message || 'حذف فرصت سرمایه‌گذاری با خطا مواجه شد. دوباره تلاش کنید.',
         variant: 'destructive',
       });
     }
   };
 
   const openFormModalForAdd = () => {
-    setSelectedEvent(null);
+    setSelectedInvestment(null);
     setShowFormModal(true);
   };
 
-  const openFormModalForEdit = (event: Event) => {
-    setSelectedEvent(event);
+  const openFormModalForEdit = (investment: Investment) => {
+    setSelectedInvestment(investment);
     setShowFormModal(true);
   };
 
-  const openDeleteModal = (event: Event) => {
-    setSelectedEvent(event);
+  const openDeleteModal = (investment: Investment) => {
+    setSelectedInvestment(investment);
     setShowDeleteModal(true);
   };
 
-  const openDetailsModal = (event: Event) => {
-    setSelectedEventId(event.id);
+  const openDetailsModal = (investment: Investment) => {
+    setSelectedInvestment(investment);
     setShowDetailsModal(true);
   };
 
-  const handleDetailsEdit = (event: Event) => {
-    setSelectedEvent(event);
+  const handleDetailsEdit = (investment: Investment) => {
+    setSelectedInvestment(investment);
     setShowDetailsModal(false);
     setShowFormModal(true);
   };
 
-  const handleDetailsDelete = (event: Event) => {
-    setSelectedEvent(event);
+  const handleDetailsDelete = (investment: Investment) => {
+    setSelectedInvestment(investment);
     setShowDetailsModal(false);
     setShowDeleteModal(true);
   };
 
-  const totalEvents = events.length;
-  const upcomingEvents = events.filter(e =>
-    e.timeRanges?.some(tr => tr.startDate && new Date(tr.startDate) > new Date())
-  ).length;
+  const totalInvestments = investments.length;
+  const activeInvestments = investments.filter(i => i.status === 'active').length;
+  const totalViews = investments.reduce((sum, i) => sum + (i.views || 0), 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -149,14 +142,14 @@ export function EventDashboard() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              مدیریت رویدادها
+              مدیریت فرصت‌های سرمایه‌گذاری
             </h1>
             <p className="text-gray-600">
-              مدیریت حرفه‌ای و ساده رویدادها در یک داشبورد
+              مدیریت حرفه‌ای و ساده فرصت‌های سرمایه‌گذاری در یک داشبورد
             </p>
           </div>
           <Button
-            onClick={loadEvents}
+            onClick={loadInvestments}
             variant="outline"
             size="sm"
             disabled={loading}
@@ -189,16 +182,16 @@ export function EventDashboard() {
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                کل رویدادها
+                کل فرصت‌ها
               </CardTitle>
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {totalEvents}
+                {totalInvestments}
               </div>
               <p className="text-xs text-gray-500">
-                {totalEvents > 0 ? 'رویداد ثبت‌شده' : 'رویدادی ثبت نشده'}
+                {totalInvestments > 0 ? 'فرصت ثبت‌شده' : 'فرصتی ثبت نشده'}
               </p>
             </CardContent>
           </Card>
@@ -206,19 +199,17 @@ export function EventDashboard() {
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                رویدادهای پیش‌رو
+                فرصت‌های فعال
               </CardTitle>
-              <Users className="h-4 w-4 text-green-600" />
+              <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {upcomingEvents}
+                {activeInvestments}
               </div>
               <p className="text-xs text-gray-500">
-                {totalEvents > 0
-                  ? `${Math.round(
-                      (upcomingEvents / totalEvents) * 100
-                    )}٪ آینده`
+                {totalInvestments > 0
+                  ? `${Math.round((activeInvestments / totalInvestments) * 100)}٪ فعال`
                   : 'نامشخص'}
               </p>
             </CardContent>
@@ -227,16 +218,16 @@ export function EventDashboard() {
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                نتایج جستجو
+                کل بازدیدها
               </CardTitle>
-              <Search className="h-4 w-4 text-purple-600" />
+              <Eye className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {filteredEvents.length}
+                {totalViews}
               </div>
               <p className="text-xs text-gray-500">
-                {searchTerm ? 'نتایج فیلترشده' : 'همه رویدادها'}
+                بازدید از فرصت‌ها
               </p>
             </CardContent>
           </Card>
@@ -248,10 +239,10 @@ export function EventDashboard() {
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-xl font-semibold text-gray-900">
-                  لیست رویدادها
+                  لیست فرصت‌های سرمایه‌گذاری
                 </CardTitle>
                 <Badge className="bg-blue-100 text-blue-800">
-                  {filteredEvents.length} رویداد
+                  {filteredInvestments.length} فرصت
                 </Badge>
               </div>
 
@@ -259,7 +250,7 @@ export function EventDashboard() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="جستجوی رویداد..."
+                    placeholder="جستجوی فرصت..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="pl-10 w-full sm:w-64"
@@ -271,15 +262,15 @@ export function EventDashboard() {
                   disabled={connectionError}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  افزودن رویداد
+                  افزودن فرصت
                 </Button>
               </div>
             </div>
           </CardHeader>
 
           <CardContent>
-            <EventTable
-              events={filteredEvents}
+            <InvestmentTable
+              investments={filteredInvestments}
               loading={loading}
               onEdit={openFormModalForEdit}
               onDelete={openDeleteModal}
@@ -288,27 +279,27 @@ export function EventDashboard() {
           </CardContent>
         </Card>
 
-        <EventFormModal
+        <InvestmentFormModal
           isOpen={showFormModal}
           onClose={() => {
             setShowFormModal(false);
-            setSelectedEvent(null);
+            setSelectedInvestment(null);
           }}
-          onSubmit={handleSubmitEvent}
-          event={selectedEvent}
+          onSubmit={handleSubmitInvestment}
+          investment={selectedInvestment}
         />
 
         <DeleteConfirmationModal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
-          onConfirm={handleDeleteEvent}
-          name={selectedEvent ? selectedEvent.title.fa : ''}
+          onConfirm={handleDeleteInvestment}
+          name={selectedInvestment ? selectedInvestment.title.fa : ''}
         />
 
-        <EventDetailsModal
+        <InvestmentDetailsModal
           isOpen={showDetailsModal}
           onClose={() => setShowDetailsModal(false)}
-          eventId={selectedEventId}
+          investment={selectedInvestment}
           onEdit={handleDetailsEdit}
           onDelete={handleDetailsDelete}
         />
