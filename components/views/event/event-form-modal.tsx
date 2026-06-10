@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CreateEventDto, UpdateEventDto, Event, EventTimeRange } from '@/types';
+import { CreateEventDto, UpdateEventDto, Event, EventTimeRange, MoneyValue } from '@/types';
+import { MoneyInput } from '@/components/ui/money-input';
 import { TimeRangePicker } from './time-range-picker';
 import MapComponentWrapper from '@/components/ui/mapPicker';
 
@@ -243,15 +244,11 @@ export function EventFormModal({ isOpen, onClose, onSubmit, event }: EventFormMo
 
                     {/* قیمت */}
                     <div>
-                        <Label htmlFor="price">قیمت</Label>
-                        <Input
-                            id="price"
-                            type="number"
-                            value={formData.price ?? ''}
-                            onChange={(e) => handleChange('price', e.target.value === '' ? undefined : Number(e.target.value))}
-                            placeholder="قیمت به تومان"
-                            min={0}
-                            step={0.01}
+                        <Label>قیمت بلیت</Label>
+                        <MoneyInput
+                            value={(formData.price as MoneyValue | undefined) ?? undefined}
+                            onChange={(v) => handleChange('price', v)}
+                            placeholder="مبلغ"
                         />
                         {errors.price && <p className="text-sm text-red-500 mt-1">{errors.price}</p>}
                     </div>

@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CreateLocationDto, UpdateLocationDto, Location, LatLng } from '@/types';
+import { CreateLocationDto, UpdateLocationDto, Location, LatLng, MoneyValue } from '@/types';
+import { MoneyInput } from '@/components/ui/money-input';
 import MapComponentWrapper from '@/components/ui/mapPicker';
 
 const supportedLanguages = [
@@ -16,7 +17,7 @@ const supportedLanguages = [
     { code: 'zh', label: '中文' },
 ];
 
-type MLKeys = 'name' | 'description' | 'openingHours' | 'entryFee';
+type MLKeys = 'name' | 'description' | 'openingHours';
 
 interface LocationFormModalProps {
     isOpen: boolean;
@@ -38,7 +39,7 @@ export function LocationFormModal({
         name: { ...emptyML },
         description: { ...emptyML },
         openingHours: { ...emptyML },
-        entryFee: { ...emptyML },
+        entryFee: undefined,
         category: 'historical',
         images: [],
         mainImageIndex: 0,
@@ -119,8 +120,6 @@ export function LocationFormModal({
         if (!formData.description?.fa.trim()) newErrors.description = 'توضیحات فارسی الزامی است';
         if (!formData.openingHours?.fa.trim())
             newErrors.openingHours = 'ساعات بازدید فارسی الزامی است';
-        if (!formData.entryFee?.fa.trim())
-            newErrors.entryFee = 'هزینه ورود فارسی الزامی است';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -160,7 +159,6 @@ export function LocationFormModal({
             { key: 'name', label: 'نام' },
             { key: 'description', label: 'توضیحات', isTextarea: true },
             { key: 'openingHours', label: 'ساعات بازدید', isTextarea: true },
-            { key: 'entryFee', label: 'هزینه ورود', isTextarea: true },
         ];
 
     /* ---------- RENDER ---------- */
@@ -221,6 +219,16 @@ export function LocationFormModal({
                             )}
                         </div>
                     ))}
+
+                    {/* هزینه ورود */}
+                    <div>
+                        <Label>هزینه ورودیه</Label>
+                        <MoneyInput
+                            value={(formData.entryFee as MoneyValue | undefined) ?? undefined}
+                            onChange={(v) => handleChange('entryFee', v)}
+                            placeholder="مبلغ (صفر = رایگان)"
+                        />
+                    </div>
 
                     {/* دسته‌بندی */}
                     <div>

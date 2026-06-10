@@ -3,6 +3,11 @@ export interface MultilingualText {
   [langCode: string]: string; // { fa: "عنوان فارسی", en: "English Title", ar: "العنوان" }
 }
 
+export interface MoneyValue {
+  amount: number;
+  currency: 'IRT' | 'IRR' | 'USD' | 'EUR' | 'AED' | 'CNY' | 'GBP';
+}
+
 export interface LatLng {
   lat: number;
   lng: number;
@@ -20,7 +25,7 @@ export interface Location {
   latlng?: LatLng;
   facilities?: Record<string, string[]>; // چندزبانه
   openingHours: MultilingualText;
-  entryFee: MultilingualText;
+  entryFee?: MoneyValue | null;
   rating: number;
   reviews: number;
 }
@@ -34,7 +39,7 @@ export interface CreateLocationDto {
   latlng?: LatLng;
   facilities?: Record<string, string[]>;
   openingHours: MultilingualText;
-  entryFee: MultilingualText;
+  entryFee?: MoneyValue;
   rating?: number;
   reviews?: number;
 }
@@ -87,7 +92,7 @@ export interface Event {
   organizer: MultilingualText;
   image?: string | null;
   latlng?: LatLng | null;
-  price?: number | null;
+  price?: MoneyValue | null;
   capacity: number;
   registered: number;
   timeRanges?: EventTimeRange[];
@@ -100,7 +105,7 @@ export interface CreateEventDto {
   organizer: MultilingualText;
   image?: string;
   latlng?: LatLng;
-  price?: number;
+  price?: MoneyValue;
   capacity?: number;
   registered?: number;
   timeRanges?: EventTimeRange[];
@@ -127,11 +132,12 @@ export interface Investment {
   title: MultilingualText;
   shortDescription: MultilingualText;
   fullDescription: MultilingualText;
-  image?: string | null;
+  images?: string[];
+  mainImageIndex?: number;
   category: InvestmentCategory;
   icon?: string | null;
-  minInvestment?: string | null;
-  maxInvestment?: string | null;
+  minInvestment?: MoneyValue | null;
+  maxInvestment?: MoneyValue | null;
   expectedReturn?: string | null;
   timeframe?: string | null;
   riskLevel?: RiskLevel | null;
@@ -150,11 +156,12 @@ export interface CreateInvestmentDto {
   title: MultilingualText;
   shortDescription: MultilingualText;
   fullDescription: MultilingualText;
-  image?: string;
+  images?: string[];
+  mainImageIndex?: number;
   category: InvestmentCategory;
   icon?: string;
-  minInvestment?: string;
-  maxInvestment?: string;
+  minInvestment?: MoneyValue;
+  maxInvestment?: MoneyValue;
   expectedReturn?: string;
   timeframe?: string;
   riskLevel?: RiskLevel;

@@ -20,7 +20,6 @@ export function LocationDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -120,7 +119,7 @@ export function LocationDashboard() {
   };
 
   const openDetailsModal = (location: Location) => {
-    setSelectedLocationId(location.id!);
+    setSelectedLocation(location);
     setShowDetailsModal(true);
   };
 
@@ -140,8 +139,8 @@ export function LocationDashboard() {
   const topRatedLocations = locations.filter(l => l.rating >= 4).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -303,8 +302,11 @@ export function LocationDashboard() {
 
         <LocationDetailsModal
           isOpen={showDetailsModal}
-          onClose={() => setShowDetailsModal(false)}
-          locationId={selectedLocationId}
+          onClose={() => {
+            setShowDetailsModal(false);
+            setSelectedLocation(null);
+          }}
+          location={selectedLocation}
           onEdit={handleDetailsEdit}
           onDelete={handleDetailsDelete}
         />

@@ -1,11 +1,9 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { CreateInvestmentDto, UpdateInvestmentDto } from '@/types';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export class InvestmentAPI {
   private static axiosInstance: AxiosInstance = axios.create({
-    baseURL: `${API_BASE_URL}/api/investments`,
+    baseURL: `/api/investments`,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -31,16 +29,28 @@ export class InvestmentAPI {
     }
   }
 
-  static async createInvestment(dto: CreateInvestmentDto) {
+  private static buildFormData(dto: CreateInvestmentDto | UpdateInvestmentDto, files: File[]): FormData {
+    const form = new FormData();
+    const dtoWithoutImages = { ...dto } as any;
+    delete dtoWithoutImages.images;
+    form.append('dto', JSON.stringify(dtoWithoutImages));
+    files.forEach((file) => form.append('images', file));
+    return form;
+  }
+
+  static async createInvestment(dto: CreateInvestmentDto, files: File[] = []) {
     try {
-      const response = await this.axiosInstance.post('', dto);
+      const form = this.buildFormData(dto, files);
+      const response = await this.axiosInstance.post('', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       this.handleAxiosError(error);
     }
   }
 
-  static async getAllInvestments(page: number = 1, limit: number = 10) {
+  static async getAllInvestments(page: number = 1, limit: number = 100) {
     try {
       const response = await this.axiosInstance.get('', {
         params: { page, limit },
@@ -62,7 +72,7 @@ export class InvestmentAPI {
 
   static async getInvestmentsByCategory(category: string) {
     try {
-      const response = await this.axiosInstance.get(`category/${category}`);
+      const response = await this.axiosInstance.get(`/category/${category}`);
       return response.data;
     } catch (error) {
       this.handleAxiosError(error);
@@ -71,7 +81,7 @@ export class InvestmentAPI {
 
   static async getInvestmentsByStatus(status: string) {
     try {
-      const response = await this.axiosInstance.get(`status/${status}`);
+      const response = await this.axiosInstance.get(`/status/${status}`);
       return response.data;
     } catch (error) {
       this.handleAxiosError(error);
@@ -80,7 +90,7 @@ export class InvestmentAPI {
 
   static async getTopInvestmentsByViews(limit: number = 7) {
     try {
-      const response = await this.axiosInstance.get('top/views', {
+      const response = await this.axiosInstance.get('/top/views', {
         params: { limit },
       });
       return response.data;
@@ -89,9 +99,12 @@ export class InvestmentAPI {
     }
   }
 
-  static async updateInvestment(id: string, dto: UpdateInvestmentDto) {
+  static async updateInvestment(id: string, dto: UpdateInvestmentDto, files: File[] = []) {
     try {
-      const response = await this.axiosInstance.put(`/${id}`, dto);
+      const form = this.buildFormData(dto, files);
+      const response = await this.axiosInstance.put(`/${id}`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       this.handleAxiosError(error);

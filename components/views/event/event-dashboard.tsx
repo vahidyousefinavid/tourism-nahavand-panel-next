@@ -20,7 +20,6 @@ export function EventDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -121,7 +120,7 @@ export function EventDashboard() {
   };
 
   const openDetailsModal = (event: Event) => {
-    setSelectedEventId(event.id);
+    setSelectedEvent(event);
     setShowDetailsModal(true);
   };
 
@@ -143,8 +142,8 @@ export function EventDashboard() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -307,8 +306,11 @@ export function EventDashboard() {
 
         <EventDetailsModal
           isOpen={showDetailsModal}
-          onClose={() => setShowDetailsModal(false)}
-          eventId={selectedEventId}
+          onClose={() => {
+            setShowDetailsModal(false);
+            setSelectedEvent(null);
+          }}
+          event={selectedEvent}
           onEdit={handleDetailsEdit}
           onDelete={handleDetailsDelete}
         />

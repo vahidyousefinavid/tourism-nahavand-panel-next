@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { Event } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, MapPin, Users, DollarSign } from 'lucide-react';
+import { formatMoney } from '@/lib/formatMoney';
 
 interface EventTableProps {
   events: Event[];
@@ -14,159 +14,190 @@ interface EventTableProps {
   onViewDetails: (event: Event) => void;
 }
 
-export function EventTable({
-  events,
-  loading,
-  onEdit,
-  onDelete,
-  onViewDetails,
-}: EventTableProps) {
-  const [sortBy, setSortBy] = useState<keyof Event>('title');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
-  const handleSort = (field: keyof Event) => {
-    if (sortBy === field) {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(field);
-      setSortOrder('asc');
-    }
-  };
+export function EventTable({ events, loading, onEdit, onDelete, onViewDetails }: EventTableProps) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
-  const sortedEvents = [...events].sort((a, b) => {
-    let aValue = a[sortBy];
-    let bValue = b[sortBy];
-
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    return 0;
-  });
-
-  if (loading) return <p>در حال بارگذاری رویدادها...</p>;
-  if (events.length === 0) return <p>هیچ رویدادی یافت نشد.</p>;
+  if (events.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Users className="w-8 h-8 text-blue-300" />
+        </div>
+        <p className="text-gray-400 text-sm">هیچ رویدادی یافت نشد</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {/* Desktop Table */}
-      <div className="hidden lg:block">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-200">
-                {[
-                  { label: 'عنوان', field: 'title' as keyof Event },
-                  { label: 'مکان', field: 'location' as keyof Event },
-                  { label: 'قیمت', field: 'price' as keyof Event },
-                  { label: 'ظرفیت', field: 'capacity' as keyof Event },
-                  { label: 'برگزارکننده', field: 'organizer' as keyof Event },
-                ].map(({ label, field }) => (
-                  <th key={field} className="py-3 px-4">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort(field)}
-                      className="h-auto p-0 font-semibold text-gray-600 hover:text-gray-900 flex items-center gap-1"
-                    >
-                      {label}
-                    </Button>
-                  </th>
-                ))}
-                <th className="py-3 px-4 text-right">عملیات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedEvents.map(event => (
+      <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-100">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-100">
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500 w-14">تصویر</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">عنوان</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">مکان</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">قیمت</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">ظرفیت</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">برگزارکننده</th>
+              <th className="py-3 px-4 text-right text-xs font-semibold text-gray-500">بازدید</th>
+              <th className="py-3 px-4 text-left text-xs font-semibold text-gray-500">عملیات</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {events.map(event => {
+              const imgSrc = event.image
+                ? event.image.startsWith('data:')
+                  ? event.image
+                  : `${API_URL}${event.image}`
+                : null;
+              const remaining = event.capacity - event.registered;
+              const isLow = remaining < 10;
+
+              return (
                 <tr
                   key={event.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="hover:bg-gray-50/60 transition-colors cursor-pointer"
+                  onClick={() => onViewDetails(event)}
                 >
-                  <td className="py-4 px-4">
-                    {/* تصویر کوچک */}
-                    {event.image && (
+                  <td className="py-3 px-4">
+                    {imgSrc ? (
                       <img
-                        src={
-                          event.image.startsWith('data:')
-                            ? event.image
-                            : `${process.env.NEXT_PUBLIC_API_URL}${event.image}`
-                        }
-                        alt={event.title['fa']}
-                        className="inline-block w-10 h-10 object-cover rounded mr-2"
+                        src={imgSrc}
+                        alt={event.title?.fa}
+                        className="w-10 h-10 object-cover rounded-lg"
                       />
+                    ) : (
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-300 text-xs">
+                        📅
+                      </div>
                     )}
-                    {event.title['fa']}
                   </td>
-                  <td className="py-4 px-4">{event.location['fa']}</td>
-                  <td className="py-4 px-4">
-                    {event.price ?? 'رایگان'}
+                  <td className="py-3 px-4">
+                    <span className="font-semibold text-gray-800 line-clamp-1">{event.title?.fa}</span>
                   </td>
-                  <td className="py-4 px-4">{event.capacity}</td>
-                  <td className="py-4 px-4">{event.organizer['fa']}</td>
-                  <td className="py-4 px-4 text-right flex justify-end space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(event)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDelete(event)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <td className="py-3 px-4">
+                    <span className="flex items-center gap-1.5 text-gray-500">
+                      <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate max-w-[120px]">{event.location?.fa}</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      !event.price || (event.price as any)?.amount === 0
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      <DollarSign className="w-3 h-3" />
+                      {!event.price || (event.price as any)?.amount === 0
+                        ? 'رایگان'
+                        : formatMoney(event.price as any, 'fa')}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      isLow ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      <Users className="w-3 h-3" />
+                      {event.registered}/{event.capacity}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-gray-500 text-xs">{event.organizer?.fa}</td>
+                  <td className="py-3 px-4 text-gray-500 text-xs">
+                    {(event.views ?? 0).toLocaleString('fa-IR')}
+                  </td>
+                  <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center gap-1 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewDetails(event)}
+                        className="w-8 h-8 p-0 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50"
+                        title="مشاهده جزئیات"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(event)}
+                        className="w-8 h-8 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                        title="ویرایش"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDelete(event)}
+                        className="w-8 h-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                        title="حذف"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4">
-        {sortedEvents.map(event => (
-          <Card
-            key={event.id}
-            className="p-4 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="font-semibold text-gray-900">
-                  {event.title['fa']}
+      {/* Mobile Cards */}
+      <div className="lg:hidden space-y-3">
+        {events.map(event => {
+          const imgSrc = event.image ? `${API_URL}${event.image}` : null;
+          return (
+            <Card key={event.id} className="p-4 hover:shadow-md transition-shadow border-0 shadow-sm">
+              <div className="flex items-start gap-3">
+                {imgSrc ? (
+                  <img src={imgSrc} alt={event.title?.fa} className="w-14 h-14 object-cover rounded-xl flex-shrink-0" />
+                ) : (
+                  <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📅</div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900 text-sm mb-0.5 truncate">{event.title?.fa}</p>
+                  <p className="text-gray-500 text-xs mb-1">{event.location?.fa}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="bg-gray-100 text-gray-600 text-[11px] px-2 py-0.5 rounded-full">
+                      ظرفیت: {event.capacity}
+                    </span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${!event.price || (event.price as any)?.amount === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+                      {!event.price || (event.price as any)?.amount === 0 ? 'رایگان' : formatMoney(event.price as any, 'fa')}
+                    </span>
+                    <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                      <Eye className="w-3 h-3" />
+                      {(event.views ?? 0).toLocaleString('fa-IR')}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  {event.location['fa']}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {event.price ?? 'رایگان'} — ظرفیت: {event.capacity}
+                <div className="flex flex-col gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => onViewDetails(event)} className="w-8 h-8 p-0 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50">
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onEdit(event)} className="w-8 h-8 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onDelete(event)} className="w-8 h-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex space-x-2">
-                {/* <Button variant="ghost" size="sm" onClick={() => onViewDetails(event)}>
-                  <Eye className="h-4 w-4" />
-                </Button> */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(event)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDelete(event)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

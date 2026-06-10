@@ -58,13 +58,13 @@ export function InvestmentDashboard() {
     }
   };
 
-  const handleSubmitInvestment = async (investmentData: CreateInvestmentDto) => {
+  const handleSubmitInvestment = async (investmentData: CreateInvestmentDto, files: File[] = []) => {
     try {
       if (selectedInvestment) {
-        await InvestmentAPI.updateInvestment(selectedInvestment.id, investmentData);
+        await InvestmentAPI.updateInvestment(selectedInvestment.id, investmentData, files);
         toast({ title: 'موفق', description: 'فرصت سرمایه‌گذاری با موفقیت ویرایش شد.' });
       } else {
-        await InvestmentAPI.createInvestment(investmentData);
+        await InvestmentAPI.createInvestment(investmentData, files);
         toast({ title: 'موفق', description: 'فرصت سرمایه‌گذاری با موفقیت ثبت شد.' });
       }
       await loadInvestments();
@@ -136,8 +136,8 @@ export function InvestmentDashboard() {
   const totalViews = investments.reduce((sum, i) => sum + (i.views || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
