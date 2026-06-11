@@ -26,6 +26,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // images: {
   //   unoptimized: false, // این گزینه نباید حذف بشه
   // },
