@@ -5,10 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DOMAIN_API: http://tourism-nahavand-api-nest:4000
+        NEXT_PUBLIC_API_URL: http://tourism-nahavand-api-nest:4000
     container_name: tourism-nahavand-panel-next
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=production
     networks:
