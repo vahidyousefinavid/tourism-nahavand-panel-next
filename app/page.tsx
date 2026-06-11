@@ -74,11 +74,11 @@ export default function Dashboard() {
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="p-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 mb-1">خوش آمدید</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 mb-1">خوش آمدید</h1>
           <p className="text-gray-400 text-sm">آمار و اطلاعات کلی سیستم مدیریت گردشگری نهاوند</p>
         </div>
         <button

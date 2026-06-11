@@ -142,15 +142,15 @@ export function EventDashboard() {
   ).length;
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 pt-4 pb-8 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 sm:mb-8 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">
               مدیریت رویدادها
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               مدیریت حرفه‌ای و ساده رویدادها در یک داشبورد
             </p>
           </div>
@@ -159,7 +159,7 @@ export function EventDashboard() {
             variant="outline"
             size="sm"
             disabled={loading}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 flex-shrink-0"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             بروزرسانی

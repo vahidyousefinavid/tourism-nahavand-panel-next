@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={iranSans.className}>
         <TopLoader />
         {isAuthenticated && <Sidebar />}
-        <main className={isAuthenticated ? 'mr-64 min-h-screen bg-slate-50' : 'min-h-screen'}>
+        <main className={isAuthenticated ? 'lg:mr-64 min-h-screen bg-slate-50 pt-14 lg:pt-0' : 'min-h-screen'}>
           {children}
         </main>
       </body>
