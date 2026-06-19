@@ -14,8 +14,11 @@ import {
 } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CreateInvestmentDto, Investment } from '@/types';
-import { Plus, Trash2, Star, Upload } from 'lucide-react';
+import { Plus, Trash2, Star, Upload, MapPin, X } from 'lucide-react';
 import { MoneyInput } from '@/components/ui/money-input';
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('@/components/ui/map-component'), { ssr: false });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -98,6 +101,7 @@ export function InvestmentFormModal({ isOpen, onClose, onSubmit, investment }: I
         contactInfo: investment.contactInfo || {},
         supportPhone: investment.supportPhone || '',
         status: investment.status,
+        latlng: (investment as any).latlng ?? null,
         mainImageIndex: investment.mainImageIndex ?? 0,
       });
       setImageList((investment.images || []).map((url) => ({ kind: 'existing', url })));
@@ -467,6 +471,55 @@ export function InvestmentFormModal({ isOpen, onClose, onSubmit, investment }: I
           {renderArrayField('features', 'ویژگی‌ها')}
           {renderArrayField('requirements', 'شرایط و الزامات')}
           {renderArrayField('benefits', 'مزایا')}
+
+          {/* موقعیت جغرافیایی — برای اطلس سرمایه‌گذاری */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-blue-500" />
+                  موقعیت جغرافیایی (اطلس)
+                </Label>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  روی نقشه کلیک کنید تا موقعیت انتخاب شود
+                </p>
+              </div>
+              {(formData as any).latlng && (
+                <button
+                  type="button"
+                  onClick={() => handleChange('latlng' as any, null)}
+                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                  حذف موقعیت
+                </button>
+              )}
+            </div>
+
+            <MapComponent
+              center={(formData as any).latlng ?? undefined}
+              selectedLocation={(formData as any).latlng ?? null}
+              onLocationSelect={(latlng) => handleChange('latlng' as any, latlng)}
+              height="260px"
+            />
+
+            {(formData as any).latlng ? (
+              <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 text-xs text-blue-700">
+                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                <span dir="ltr" className="font-mono">
+                  {((formData as any).latlng.lat as number).toFixed(6)}
+                  {' , '}
+                  {((formData as any).latlng.lng as number).toFixed(6)}
+                </span>
+                <span className="text-blue-400 mr-auto">موقعیت انتخاب شد ✓</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 bg-gray-50 border border-dashed border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-400">
+                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                موقعیتی انتخاب نشده — روی نقشه کلیک کنید
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>انصراف</Button>

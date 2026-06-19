@@ -3,6 +3,9 @@
 @tailwind utilities;
 @import 'leaflet/dist/leaflet.css';
 
+.leaflet-container { background: #e8ead8; isolation: isolate; }
+.leaflet-tile { transition: opacity 0.2s ease !important; }
+
 :root {
   color-scheme: light;
 }

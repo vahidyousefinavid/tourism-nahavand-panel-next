@@ -147,6 +147,7 @@ export interface Investment {
   contactInfo?: MultilingualText;
   supportPhone?: string | null;
   status: InvestmentStatus;
+  latlng?: LatLng | null;
   views?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -171,6 +172,110 @@ export interface CreateInvestmentDto {
   contactInfo?: MultilingualText;
   supportPhone?: string;
   status?: InvestmentStatus;
+  latlng?: LatLng | null;
 }
 
 export interface UpdateInvestmentDto extends Partial<CreateInvestmentDto> {}
+
+// ------------------- CREATIVE CITY INITIATIVE -------------------
+
+export type InitiativeStatus = 'active' | 'ongoing' | 'planned' | 'completed';
+
+export interface CreativeCityInitiative {
+  id: string;
+  title: string;
+  description?: string;
+  sector: string;
+  status: InitiativeStatus;
+  activityLevel: number;
+  participantsCount: number;
+  startYear?: string;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCreativeCityInitiativeDto {
+  title: string;
+  description?: string;
+  sector: string;
+  status?: InitiativeStatus;
+  activityLevel?: number;
+  participantsCount?: number;
+  startYear?: string;
+  imageUrl?: string;
+}
+
+export interface UpdateCreativeCityInitiativeDto extends Partial<CreateCreativeCityInitiativeDto> {}
+
+// ------------------- CREATIVE CITY NEWS -------------------
+
+export type NewsStatus = 'draft' | 'published';
+
+export interface CreativeCityNews {
+  id: string;
+  title: string;
+  summary: string;
+  content?: string;
+  imageUrl?: string;
+  category?: string;
+  status: NewsStatus;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCreativeCityNewsDto {
+  title: string;
+  summary: string;
+  content?: string;
+  imageUrl?: string;
+  category?: string;
+  status?: NewsStatus;
+}
+
+export interface UpdateCreativeCityNewsDto extends Partial<CreateCreativeCityNewsDto> {}
+
+// ------------------- CREATIVE CITY PARTICIPATION -------------------
+
+export type ParticipationStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
+
+export interface CreativeCityParticipation {
+  id: string;
+  name: string;
+  phone: string;
+  ageGroup?: string;
+  domain: string;
+  ideaTitle: string;
+  ideaDesc: string;
+  participation?: string[];
+  status: ParticipationStatus;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ------------------- INVESTMENT SUGGESTION -------------------
+
+export type SuggestionStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
+
+export interface InvestmentSuggestion {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  nationalCode?: string;
+  title: string;
+  description: string;
+  investmentArea?: string;
+  category?: string;
+  estimatedAmount?: MoneyValue | null;
+  expectedReturn?: string;
+  timeframe?: string;
+  additionalNotes?: string;
+  latlng?: LatLng | null;
+  status: SuggestionStatus;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
